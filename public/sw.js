@@ -1,5 +1,5 @@
 // Service worker do NeuroBaby: funciona offline guardando o app em cache.
-const CACHE = 'neurobaby-v1.2.1'
+const CACHE = 'neurobaby-v1.2.2'
 const SHELL = ['./', './index.html', './manifest.webmanifest', './logo-ilustracao.png', './icons/icon-192.png']
 
 self.addEventListener('install', (e) => {

@@ -1,6 +1,6 @@
 # NeuroBaby — Documentação técnica
 
-Versão do app: **1.2.1** · Atualizado em 03/11/2026 · Criado por Guilherme Oliveira
+Versão do app: **1.2.2** · Atualizado em 03/11/2026 · Criado por Guilherme Oliveira
 
 O NeuroBaby é um **webapp PWA** (Progressive Web App) escrito em **JavaScript com React**, empacotado com **Vite**,
 hospedado gratuitamente no **GitHub Pages** e com backup dos dados no **Google Drive** de cada usuário.
@@ -13,6 +13,10 @@ Não existe servidor nem banco de dados próprio: o app roda inteiro no navegado
 | Pasta de trabalho | `J:\Meu Drive\NeuroBaby` (Google Drive do computador) |
 | Login e backup | Google Cloud, conta `projetosguilherme7@gmail.com`, projeto `neurobaby` |
 | Histórico de versões | [AJUSTES.md](AJUSTES.md) |
+| Apresentação do sistema (com passo a passo) | https://claude.ai/artifact/R1ytK3RrX5dYiMxYeJwjjz |
+| Documentação técnica com prints | https://claude.ai/artifact/WWkUoKNFRWJg9vKLHe9ogv |
+
+![As 16 telas principais do NeuroBaby](docs/imagens/tec-todas-as-telas.png)
 
 ---
 
@@ -123,6 +127,10 @@ NeuroBaby/
   3. publica a pasta `dist/` no GitHub Pages (~1–2 min).
 - O site é estático e público (qualquer pessoa com o link abre); os dados de saúde nunca passam pelo GitHub.
 
+![Repositório no GitHub](docs/imagens/tec-github-repositorio.png)
+
+![Execuções do workflow de publicação](docs/imagens/tec-github-actions.png)
+
 ### Google Cloud (login e Drive)
 - Conta dona: `projetosguilherme7@gmail.com` · Projeto: `neurobaby`.
 - API ativada: **Google Drive API**.
@@ -134,6 +142,10 @@ NeuroBaby/
   Origens JavaScript autorizadas: `https://guilhermeoliveirati.github.io` e `http://localhost:5180`.
 - Escopo pedido: `https://www.googleapis.com/auth/drive.appdata` — o app só enxerga a própria pasta oculta; não lê
   nem altera os demais arquivos do Drive. O segredo do cliente não é usado.
+
+![Google Auth Platform: modo Testando com 2 usuários de teste](docs/imagens/tec-google-publico.png)
+
+![Cliente OAuth NeuroBaby Web com as origens autorizadas](docs/imagens/tec-google-cliente.png)
 
 ---
 

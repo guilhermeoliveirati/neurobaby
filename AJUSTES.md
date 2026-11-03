@@ -10,6 +10,13 @@ Regra da versão (`maior.menor.correção`):
 
 ---
 
+## 1.2.2 — 03/11/2026
+- Apresentação refeita: para que serve, por que foi criado, para quem é e passo a passo em 6 passos com imagens
+  (https://claude.ai/artifact/R1ytK3RrX5dYiMxYeJwjjz).
+- Nova documentação técnica com prints e diagrama de arquitetura (https://claude.ai/artifact/WWkUoKNFRWJg9vKLHe9ogv).
+- Prints das telas, do GitHub e do Google Cloud salvos em `docs/imagens` e usados no `DOCUMENTACAO_TECNICA.md`.
+- Nenhuma mudança nas telas do app.
+
 ## 1.2.1 — 03/11/2026
 - Criado `DOCUMENTACAO_TECNICA.md`: linguagens e versões, arquitetura, pastas, rotas, hospedagem (GitHub Pages),
   Google Cloud (OAuth e Drive), desenvolvimento local e privacidade dos dados.
