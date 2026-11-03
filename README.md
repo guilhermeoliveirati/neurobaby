@@ -37,7 +37,8 @@ Para instalar como app no celular e usar o Google Drive, ela precisa estar em **
 3. Coloque o Client ID em `.env.local` (`VITE_GOOGLE_CLIENT_ID=...`, veja `.env.example`)
    ou no app em **Perfil → Backup e Google Drive → Configuração avançada do Google**.
 
-## Versão
-A versão fica em `package.json` e aparece em "Sobre" e "Backup". Incremente a cada alteração.
+## Versão e histórico
+A versão fica em `package.json` e aparece no rodapé de todas as telas. **Todo ajuste sobe a versão** e é registrado em
+[AJUSTES.md](AJUSTES.md).
 
 > As informações do app são educativas e não substituem a orientação da equipe de saúde.

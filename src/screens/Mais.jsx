@@ -194,7 +194,6 @@ function Sobre() {
         <p>O NeuroBaby acompanha você desde a gestação até os primeiros anos do bebê, com foco no controle do diabetes gestacional e no estímulo ao neurodesenvolvimento.</p>
         <p className="muted pequeno">As informações do app são educativas e não substituem a orientação da sua equipe de saúde.</p>
       </div>
-      <p className="versao">Versão {__APP_VERSION__}</p>
     </div>
   )
 }
@@ -287,7 +286,6 @@ function Backup() {
           <button className="btn btn-primario btn-largo">Salvar</button>
         </form>
       </Folha>
-      <p className="versao">NeuroBaby v{__APP_VERSION__}</p>
     </div>
   )
 }

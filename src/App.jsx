@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useEstado } from './data/store'
 import './data/drive'
-import { useRota, Navegacao } from './components/ui'
+import { useRota, Navegacao, Rodape } from './components/ui'
 import { Splash, BoasVindas } from './screens/Abertura'
 import Inicio from './screens/Inicio'
 import Gestacao from './screens/Gestacao'
@@ -24,7 +24,7 @@ export default function App() {
     return () => clearTimeout(t)
   }, [abrindo])
 
-  if (!perfil.nome) return <div className="app"><BoasVindas /></div>
+  if (!perfil.nome) return <div className="app"><BoasVindas /><Rodape /></div>
   if (abrindo) return <div className="app"><Splash /></div>
 
   const telas = {
@@ -38,6 +38,7 @@ export default function App() {
   return (
     <div className="app com-nav">
       <main key={`${pagina}/${sub || ''}`}>{telas[pagina]}</main>
+      <Rodape />
       <Navegacao atual={ABA_DA_ROTA[pagina]} />
     </div>
   )

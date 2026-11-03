@@ -109,6 +109,10 @@ export function Campo({ rotulo, children }) {
   )
 }
 
+export function Rodape() {
+  return <footer className="rodape">Criado por Guilherme Oliveira | Versão: {__APP_VERSION__}</footer>
+}
+
 export function Vazio({ children }) {
   return <p className="vazio">{children}</p>
 }
