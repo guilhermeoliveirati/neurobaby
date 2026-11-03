@@ -1,6 +1,6 @@
 # Histórico de ajustes — NeuroBaby
 
-Toda alteração no app sobe a versão em `package.json` (ela aparece no rodapé: "Criado por Guilherme Oliveira | Versão: x.x.x")
+Toda alteração no app sobe a versão em `package.json` (ela aparece em Configurações → Sobre o app)
 e ganha uma entrada aqui, da mais nova para a mais antiga.
 
 Regra da versão (`maior.menor.correção`):
@@ -9,6 +9,10 @@ Regra da versão (`maior.menor.correção`):
 - **maior** (1.x → 2.0.0): mudança grande, por exemplo no formato dos dados salvos.
 
 ---
+
+## 1.2.0 — 03/11/2026
+- "Criado por" e "Versão" saíram do rodapé das telas e foram para **Configurações** (engrenagem em "Mais para você"), na seção "Sobre o app".
+- A tela "Backup e Google Drive" passou a se chamar **Configurações** (contém o backup e as informações do app).
 
 ## 1.1.0 — 03/11/2026
 - Rodapé em todas as telas: "Criado por Guilherme Oliveira | Versão: x.x.x".

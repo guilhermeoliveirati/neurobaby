@@ -22,7 +22,7 @@ function Menu() {
   return (
     <div className="tela">
       <Topo titulo="Mais para você" semVoltar
-        direita={<button className="icone-btn" onClick={() => ir('mais/backup')} aria-label="Backup e configurações"><Settings size={22} /></button>} />
+        direita={<button className="icone-btn" onClick={() => ir('mais/backup')} aria-label="Configurações"><Settings size={22} /></button>} />
       <div className="lista">
         <ItemLista icone="👤" cor="lilas" titulo="Meu Perfil e Histórico" href="#/mais/perfil" />
         <ItemLista icone="📅" cor="rosa" titulo="Calendário de Consultas" href="#/mais/consultas" />
@@ -30,7 +30,7 @@ function Menu() {
         <ItemLista icone="❓" cor="lilas" titulo="Perguntas Frequentes" href="#/mais/faq" />
         <ItemLista icone="🎧" cor="azul" titulo="Fale Conosco" href="#/mais/contato" />
         <ItemLista icone="💜" cor="rosa" titulo="Sobre o NeuroBaby" href="#/mais/sobre" />
-        <ItemLista icone="☁️" cor="azul" titulo="Backup e Google Drive" href="#/mais/backup" />
+        <ItemLista icone="⚙️" cor="azul" titulo="Configurações" sub="Backup, Google Drive e versão" href="#/mais/backup" />
       </div>
       <div className="card card-verde rodape-card">
         <p>Uma jornada única,<br />com todo o nosso cuidado. 💜</p>
@@ -241,7 +241,8 @@ function Backup() {
 
   return (
     <div className="tela">
-      <Topo titulo="Backup e Google Drive" />
+      <Topo titulo="Configurações" />
+      <h2 className="titulo-secao">Backup e Google Drive</h2>
       <div className="card">
         <div className="linha-titulo">
           <strong>{st.conectado ? <><Cloud size={18} className="verde" /> Google Drive conectado</> : <><CloudOff size={18} className="muted" /> Google Drive desconectado</>}</strong>
@@ -286,6 +287,12 @@ function Backup() {
           <button className="btn btn-primario btn-largo">Salvar</button>
         </form>
       </Folha>
+
+      <h2 className="titulo-secao">Sobre o app</h2>
+      <div className="card info-app">
+        <div><span>Criado por</span><strong>Guilherme Oliveira</strong></div>
+        <div><span>Versão</span><strong>{__APP_VERSION__}</strong></div>
+      </div>
     </div>
   )
 }
