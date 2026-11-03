@@ -1,0 +1,20 @@
+{
+  "name": "neurobaby",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "powershell -ExecutionPolicy Bypass -File ferramentas/neurobaby.ps1 dev",
+    "build": "powershell -ExecutionPolicy Bypass -File ferramentas/neurobaby.ps1 build",
+    "preview": "powershell -ExecutionPolicy Bypass -File ferramentas/neurobaby.ps1 preview"
+  },
+  "dependencies": {
+    "lucide-react": "^0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
