@@ -41,4 +41,6 @@ Para instalar como app no celular e usar o Google Drive, ela precisa estar em **
 A versão fica em `package.json` e aparece em **Configurações → Sobre o app**. **Todo ajuste sobe a versão** e é registrado em
 [AJUSTES.md](AJUSTES.md).
 
+Detalhes técnicos (linguagens, arquitetura, hospedagem, Google Cloud): [DOCUMENTACAO_TECNICA.md](DOCUMENTACAO_TECNICA.md).
+
 > As informações do app são educativas e não substituem a orientação da equipe de saúde.

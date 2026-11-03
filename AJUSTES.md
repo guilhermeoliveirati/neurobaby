@@ -10,6 +10,13 @@ Regra da versão (`maior.menor.correção`):
 
 ---
 
+## 1.2.1 — 03/11/2026
+- Criado `DOCUMENTACAO_TECNICA.md`: linguagens e versões, arquitetura, pastas, rotas, hospedagem (GitHub Pages),
+  Google Cloud (OAuth e Drive), desenvolvimento local e privacidade dos dados.
+- Criado o documento de apresentação do sistema (todas as telas), compartilhável pelo Claude:
+  https://claude.ai/artifact/R1ytK3RrX5dYiMxYeJwjjz
+- Nenhuma mudança nas telas do app.
+
 ## 1.2.0 — 03/11/2026
 - "Criado por" e "Versão" saíram do rodapé das telas e foram para **Configurações** (engrenagem em "Mais para você"), na seção "Sobre o app".
 - A tela "Backup e Google Drive" passou a se chamar **Configurações** (contém o backup e as informações do app).
