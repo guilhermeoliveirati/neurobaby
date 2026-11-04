@@ -35,12 +35,12 @@ Para instalar como app no celular e usar o Google Drive, ela precisa estar em **
 2. Crie uma credencial OAuth do tipo **Aplicativo da Web** e adicione em "Origens JavaScript autorizadas"
    `http://localhost:5180` e o endereço HTTPS onde o app for publicado.
 3. Coloque o Client ID em `.env.local` (`VITE_GOOGLE_CLIENT_ID=...`, veja `.env.example`)
-   ou no app em **Perfil → Backup e Google Drive → Configuração avançada do Google**.
+   ou no app em **Perfil → Configurações → Configuração avançada do Google**.
 
 ## Versão e histórico
-A versão fica em `package.json` e aparece em **Configurações → Sobre o app**. **Todo ajuste sobe a versão** e é registrado em
-[AJUSTES.md](AJUSTES.md).
+A versão fica em `package.json` e aparece em **Configurações → Sobre o app**. **Todo ajuste sobe a versão**.
 
-Detalhes técnicos (linguagens, arquitetura, hospedagem, Google Cloud): [DOCUMENTACAO_TECNICA.md](DOCUMENTACAO_TECNICA.md).
+O histórico de ajustes, a documentação técnica e a apresentação ficam apenas na pasta do projeto no Google Drive
+(fora deste repositório).
 
 > As informações do app são educativas e não substituem a orientação da equipe de saúde.
