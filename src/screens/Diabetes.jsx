@@ -96,7 +96,7 @@ function Glicemia() {
       <div className="card"><GraficoLinha pontos={pontos} meta={metaGrupo} unidade=" mg/dL" /></div>
 
       <h2 className="titulo-secao">Medições</h2>
-      {filtradas.length === 0 ? <Vazio>Nenhuma medição neste período.</Vazio> : [...filtradas].reverse().map((g) => {
+      {filtradas.length === 0 ? <Vazio>Nenhuma medição neste período.</Vazio> : <div className="registros">{[...filtradas].reverse().map((g) => {
         const st = statusGlicemia(g.valor, g.momento)
         return (
           <div key={g.id} className={`card registro borda-${st.nivel}`}>
@@ -108,7 +108,7 @@ function Glicemia() {
             <button className="icone-btn" onClick={() => confirm('Excluir esta medição?') && delItem('glicemias', g.id)} aria-label="Excluir"><Trash2 size={18} /></button>
           </div>
         )
-      })}
+      })}</div>}
       <FormGlicemia aberta={form} onFechar={() => setForm(false)} />
     </div>
   )
@@ -176,7 +176,7 @@ function Medicacoes() {
     <div className="tela">
       <Topo titulo="Medicações" />
       <button className="btn btn-primario btn-largo" onClick={() => setForm(true)}><Plus size={18} /> Adicionar medicação</button>
-      {s.medicacoes.length === 0 ? <Vazio>Nenhuma medicação cadastrada. Inclua insulina, metformina, vitaminas e suplementos.</Vazio> : s.medicacoes.map((m) => (
+      {s.medicacoes.length === 0 ? <Vazio>Nenhuma medicação cadastrada. Inclua insulina, metformina, vitaminas e suplementos.</Vazio> : <div className="registros">{s.medicacoes.map((m) => (
         <div key={m.id} className={`card registro ${m.ativo === false ? 'inativo' : ''}`}>
           <Pill size={22} className="lilas" />
           <div>
@@ -190,7 +190,7 @@ function Medicacoes() {
           </label>
           <button className="icone-btn" onClick={() => confirm('Excluir esta medicação?') && delItem('medicacoes', m.id)} aria-label="Excluir"><Trash2 size={18} /></button>
         </div>
-      ))}
+      ))}</div>}
       <Folha titulo="Nova medicação" aberta={form} onFechar={() => setForm(false)}>
         <form className="form" onSubmit={salvar}>
           <Campo rotulo="Nome"><input required value={f.nome} onChange={muda('nome')} placeholder="Ex.: Insulina NPH" /></Campo>
@@ -222,7 +222,7 @@ function Exames() {
     <div className="tela">
       <Topo titulo="Exames" />
       <button className="btn btn-primario btn-largo" onClick={() => setForm(true)}><Plus size={18} /> Registrar exame</button>
-      {lista.length === 0 ? <Vazio>Nenhum exame registrado. Ex.: hemoglobina glicada, curva glicêmica (TOTG), ultrassom.</Vazio> : lista.map((x) => (
+      {lista.length === 0 ? <Vazio>Nenhum exame registrado. Ex.: hemoglobina glicada, curva glicêmica (TOTG), ultrassom.</Vazio> : <div className="registros">{lista.map((x) => (
         <div key={x.id} className="card registro">
           <span className="item-icone bg-azul">🧪</span>
           <div>
@@ -232,7 +232,7 @@ function Exames() {
           </div>
           <button className="icone-btn" onClick={() => confirm('Excluir este exame?') && delItem('exames', x.id)} aria-label="Excluir"><Trash2 size={18} /></button>
         </div>
-      ))}
+      ))}</div>}
       <Folha titulo="Registrar exame" aberta={form} onFechar={() => setForm(false)}>
         <form className="form" onSubmit={salvar}>
           <Campo rotulo="Exame">

@@ -61,42 +61,44 @@ export default function Inicio() {
         <button onClick={() => ir('diabetes')}><span className="bg-lilas"><MoreHorizontal size={22} /></span>Mais</button>
       </div>
 
-      <div className="card card-lilas dica">
-        <Lightbulb size={26} className="dica-ic" />
-        <div>
-          <strong>Dica de hoje 💡</strong>
-          <p>{dica}</p>
-        </div>
-      </div>
-
-      {(ultGlic || proxConsulta) && (
-        <div className="resumo-linha">
-          {ultGlic && (
-            <a className={`card mini nivel-${statusGlicemia(ultGlic.valor, ultGlic.momento).nivel}`} href="#/diabetes/glicemia">
-              <small>Última glicemia</small>
-              <strong>{ultGlic.valor} <em>mg/dL</em></strong>
-            </a>
-          )}
-          {proxConsulta && (
-            <a className="card mini" href="#/mais/consultas">
-              <small>Próxima consulta</small>
-              <strong>{fmtData(proxConsulta.data).slice(0, 5)} <em>{proxConsulta.hora}</em></strong>
-            </a>
-          )}
-        </div>
-      )}
-
-      {!bebe && g && (
-        <a className="card card-info" href="#/gestacao">
-          <Ruler size={26} className="muted" />
+      <div className="painel">
+        <div className="card card-lilas dica">
+          <Lightbulb size={26} className="dica-ic" />
           <div>
-            <strong>Desenvolvimento do bebê</strong>
-            <p>Seu bebê agora mede cerca de {Math.round(tamanhoBebe(g.semanas).cm)} cm e pesa aproximadamente {tamanhoBebe(g.semanas).peso}! {fatoSemana(g.semanas)}</p>
-            {parseData(g.dpp) && <small className="muted">Data provável do parto: {fmtData(g.dpp)}</small>}
+            <strong>Dica de hoje 💡</strong>
+            <p>{dica}</p>
           </div>
-          <ChevronRight size={20} className="muted" />
-        </a>
-      )}
+        </div>
+
+        {(ultGlic || proxConsulta) && (
+          <div className="resumo-linha">
+            {ultGlic && (
+              <a className={`card mini nivel-${statusGlicemia(ultGlic.valor, ultGlic.momento).nivel}`} href="#/diabetes/glicemia">
+                <small>Última glicemia</small>
+                <strong>{ultGlic.valor} <em>mg/dL</em></strong>
+              </a>
+            )}
+            {proxConsulta && (
+              <a className="card mini" href="#/mais/consultas">
+                <small>Próxima consulta</small>
+                <strong>{fmtData(proxConsulta.data).slice(0, 5)} <em>{proxConsulta.hora}</em></strong>
+              </a>
+            )}
+          </div>
+        )}
+
+        {!bebe && g && (
+          <a className="card card-info" href="#/gestacao">
+            <Ruler size={26} className="muted" />
+            <div>
+              <strong>Desenvolvimento do bebê</strong>
+              <p>Seu bebê agora mede cerca de {Math.round(tamanhoBebe(g.semanas).cm)} cm e pesa aproximadamente {tamanhoBebe(g.semanas).peso}! {fatoSemana(g.semanas)}</p>
+              {parseData(g.dpp) && <small className="muted">Data provável do parto: {fmtData(g.dpp)}</small>}
+            </div>
+            <ChevronRight size={20} className="muted" />
+          </a>
+        )}
+      </div>
     </div>
   )
 }

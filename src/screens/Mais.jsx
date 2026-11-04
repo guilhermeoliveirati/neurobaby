@@ -93,9 +93,9 @@ function Consultas() {
       <Topo titulo="Calendário de Consultas" />
       <button className="btn btn-primario btn-largo" onClick={() => setForm(true)}><Plus size={18} /> Agendar consulta</button>
       <h2 className="titulo-secao">Próximas</h2>
-      {proximas.length === 0 ? <Vazio>Nenhuma consulta agendada.</Vazio> : proximas.map((c) => <Item key={c.id} c={c} />)}
+      {proximas.length === 0 ? <Vazio>Nenhuma consulta agendada.</Vazio> : <div className="registros">{proximas.map((c) => <Item key={c.id} c={c} />)}</div>}
       {passadas.length > 0 && <h2 className="titulo-secao">Anteriores</h2>}
-      {passadas.map((c) => <Item key={c.id} c={c} />)}
+      {passadas.length > 0 && <div className="registros">{passadas.map((c) => <Item key={c.id} c={c} />)}</div>}
       <Folha titulo="Agendar consulta" aberta={form} onFechar={() => setForm(false)}>
         <form className="form" onSubmit={salvar}>
           <div className="duas-col">
@@ -137,12 +137,12 @@ function Vacinacao() {
       <Topo titulo="Vacinação" />
       <p className="muted pequeno">Toque para marcar como aplicada. Calendário de referência do PNI — confirme sempre na sua UBS.</p>
       <h2 className="titulo-secao">Gestante</h2>
-      {VACINAS_GESTANTE.map((v) => <Vac key={v.id} {...v} />)}
+      <div className="registros">{VACINAS_GESTANTE.map((v) => <Vac key={v.id} {...v} />)}</div>
       <h2 className="titulo-secao">Bebê</h2>
       {VACINAS_BEBE.map((g) => (
         <div key={g.idade}>
           <h3 className="sub-secao">{g.idade}</h3>
-          {g.itens.map(([id, nome]) => <Vac key={id} id={id} nome={nome} quando={g.idade} devida={idade && idade.meses >= g.meses} />)}
+          <div className="registros">{g.itens.map(([id, nome]) => <Vac key={id} id={id} nome={nome} quando={g.idade} devida={idade && idade.meses >= g.meses} />)}</div>
         </div>
       ))}
     </div>

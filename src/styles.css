@@ -269,3 +269,44 @@ input, select, textarea { font: inherit; color: var(--texto); }
 .abas button { white-space: nowrap; }
 .card-info > svg, .dica > svg, .registro > svg { flex-shrink: 0; }
 @media (max-width: 380px) { .abas button { font-size: .8rem; padding: 9px 4px; } }
+
+/* Grupos de cartões: uma coluna no celular, duas no tablet */
+.painel, .registros { display: flex; flex-direction: column; gap: 14px; }
+.registros { gap: 10px; }
+.registros .vacina { margin-bottom: 0; }
+.grafico .eixo { font-size: 11px; }
+
+/* Tablet em pé (e telas a partir de 768 px) */
+@media (min-width: 768px) {
+  html { font-size: 17px; }
+  .app { max-width: 960px; }
+  .tela { padding: 20px 32px 32px; gap: 16px; }
+  .lista, .registros, .lista-atividades, .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .painel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .painel > .card-info { grid-column: 1 / -1; }
+  .grade-marcos { grid-template-columns: repeat(6, 1fr); }
+  .chips.rolagem { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; }
+  .tela > .abas, .tela > .form, .tela > .btn-largo, .tela > .seletor-semana, .tela > .fato, .tela > .logo { width: 100%; max-width: 640px; align-self: center; }
+  .ilustra-bebe { height: 230px; }
+  .splash { max-width: 720px; margin: 0 auto; }
+  .logo img { width: min(60%, 380px); }
+  .pilares { font-size: .9rem; }
+  .folha-fundo { align-items: center; padding: 24px; }
+  .folha { max-width: 560px; border-radius: 24px; padding-bottom: 20px; animation-name: surgir; }
+  .nav { max-width: 960px; }
+  .nav-item { flex-direction: row; justify-content: center; gap: 8px; font-size: .85rem; padding: 8px 0; }
+}
+@keyframes surgir { from { opacity: 0; transform: scale(.97); } }
+
+/* Tablet deitado e telas largas: navegação vira barra lateral */
+@media (min-width: 1024px) {
+  .app { max-width: none; box-shadow: none; background: none; }
+  .app.com-nav { padding-bottom: 0; padding-left: 112px; }
+  .app.com-nav main { max-width: 1040px; margin: 0 auto; }
+  .nav { top: 0; bottom: 0; left: 0; transform: none; width: 112px; max-width: none; grid-template-columns: 1fr; grid-auto-rows: min-content; align-content: center; gap: 8px; border-top: 0; border-right: 1px solid var(--borda); border-radius: 0 24px 24px 0; padding: 24px 10px; box-shadow: 4px 0 18px rgba(160, 120, 140, .08); }
+  .nav-item { flex-direction: column; gap: 4px; padding: 12px 4px; border-radius: 16px; font-size: .78rem; text-align: center; }
+  .nav-item.ativo { background: var(--rosa-claro); }
+}
+@media (min-width: 768px) {
+  .painel > :only-child, .painel > .dica:has(+ .card-info) { grid-column: 1 / -1; }
+}

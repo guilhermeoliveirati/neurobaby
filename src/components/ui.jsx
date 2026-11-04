@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, X, Home, Footprints, Brain, User } from 'lucide-react'
 
@@ -113,10 +113,28 @@ export function Vazio({ children }) {
   return <p className="vazio">{children}</p>
 }
 
-// Gráfico de linha simples em SVG; faixa opcional destaca a meta
+// Gráfico de linha simples em SVG; faixa opcional destaca a meta.
+// Usa a largura real do cartão: no tablet o gráfico fica mais largo em vez de só ampliar.
 export function GraficoLinha({ pontos, meta, unidade = '', altura = 160 }) {
-  if (pontos.length < 2) return <Vazio>Registre ao menos 2 valores para ver o gráfico.</Vazio>
-  const L = 320, A = altura, pad = { e: 34, d: 10, t: 12, b: 22 }
+  const caixa = useRef(null)
+  const [largura, setLargura] = useState(320)
+  useEffect(() => {
+    if (!caixa.current || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(([e]) => setLargura(Math.max(280, Math.round(e.contentRect.width))))
+    ro.observe(caixa.current)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div ref={caixa}>
+      {pontos.length < 2
+        ? <Vazio>Registre ao menos 2 valores para ver o gráfico.</Vazio>
+        : <Linha pontos={pontos} meta={meta} unidade={unidade} L={largura} A={largura > 520 ? Math.round(altura * 1.4) : altura} />}
+    </div>
+  )
+}
+
+function Linha({ pontos, meta, unidade, L, A }) {
+  const pad = { e: 34, d: 10, t: 12, b: 22 }
   const xs = pontos.map((p) => p.x), ys = pontos.map((p) => p.y)
   const minX = Math.min(...xs), maxX = Math.max(...xs)
   const minY = Math.floor(Math.min(...ys, meta ?? Infinity) * 0.9), maxY = Math.ceil(Math.max(...ys, meta ?? -Infinity) * 1.08)

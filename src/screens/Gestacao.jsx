@@ -72,7 +72,7 @@ function Registros({ s, onNovo }) {
         <h2 className="titulo-secao">Registros</h2>
         <button className="btn btn-pequeno" onClick={onNovo}>+ Novo</button>
       </div>
-      {regs.length === 0 ? <Vazio>Nenhum registro ainda. Anote peso e pressão a cada consulta.</Vazio> : regs.map((r) => (
+      {regs.length === 0 ? <Vazio>Nenhum registro ainda. Anote peso e pressão a cada consulta.</Vazio> : <div className="registros">{regs.map((r) => (
         <div key={r.id} className="card registro">
           <div>
             <strong>{fmtData(r.data)}</strong>
@@ -81,7 +81,7 @@ function Registros({ s, onNovo }) {
           </div>
           <button className="icone-btn" onClick={() => confirm('Excluir este registro?') && delItem('registros', r.id)} aria-label="Excluir"><Trash2 size={18} /></button>
         </div>
-      ))}
+      ))}</div>}
       <h2 className="titulo-secao">Exames</h2>
       <ItemLista icone="🧪" cor="lilas" titulo="Meus exames" sub={`${s.exames.length} registrado(s)`} href="#/diabetes/exames" />
     </>
