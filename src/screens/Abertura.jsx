@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { setEstado, useEstado } from '../data/store'
+import { Cloud } from 'lucide-react'
+import { setEstado, useEstado, substituirEstado } from '../data/store'
+import * as drive from '../data/drive'
 import { Campo, ir } from '../components/ui'
 
 export function Logo({ pequeno }) {
@@ -83,6 +85,33 @@ export function BoasVindas() {
       <Logo pequeno />
       <h2 className="titulo-secao centro">Vamos começar? 💜</h2>
       <FormPerfil textoBotao="Entrar no NeuroBaby" aoSalvar={() => ir('inicio')} />
+      <EntrarComGoogle />
+    </div>
+  )
+}
+
+// Quem já usa o app (ou saiu antes) entra com o Google e recupera o backup do Drive
+function EntrarComGoogle() {
+  const [ocupado, setOcupado] = useState(false)
+  const [msg, setMsg] = useState('')
+  if (!drive.statusDrive().clientId) return null
+
+  async function entrar() {
+    setOcupado(true); setMsg('')
+    try {
+      const dados = await drive.entrarComBackup()
+      if (dados?.perfil?.nome) { substituirEstado(dados); ir('inicio'); return }
+      setMsg('Google conectado. Não achamos dados salvos nesta conta: preencha o cadastro acima para começar.')
+    } catch (e) { setMsg(`⚠️ ${e.message}`) }
+    setOcupado(false)
+  }
+
+  return (
+    <div className="card entrar-google">
+      <strong>Já usa o NeuroBaby?</strong>
+      <p className="muted pequeno">Entre com a sua conta Google para recuperar os seus dados.</p>
+      <button className="btn btn-largo" disabled={ocupado} onClick={entrar}><Cloud size={18} /> {ocupado ? 'Entrando…' : 'Entrar com Google'}</button>
+      {msg && <p className="mensagem">{msg}</p>}
     </div>
   )
 }

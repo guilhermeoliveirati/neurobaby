@@ -124,6 +124,29 @@ export function desconectar() {
   gravarCfg({ conectado: false, pendente: false })
 }
 
+// Entrar de novo depois de sair: conecta e traz o backup (sem enviar nada antes, para não sobrescrever)
+export async function entrarComBackup() {
+  await pedirToken(true)
+  gravarCfg({ conectado: true, erro: '' })
+  const arq = await acharArquivo()
+  if (!arq) return null
+  const r = await api(`${API}/${arq.id}?alt=media`)
+  gravarCfg({ ultimoSync: Date.now(), pendente: false })
+  return r.json()
+}
+
+// Sair: encerra a sessão do Google e esquece a conexão neste aparelho
+export function sair() {
+  clearTimeout(timer)
+  if (token && window.google?.accounts?.oauth2) window.google.accounts.oauth2.revoke(token)
+  token = null
+  expiraEm = 0
+  const { clientId } = lerCfg()
+  try { localStorage.removeItem(CFG_KEY) } catch { /* ignora */ }
+  if (clientId) gravarCfg({ clientId })
+  ouvintes.forEach((fn) => fn())
+}
+
 export async function sincronizar() {
   await garantirToken()
   await enviar(getEstado())

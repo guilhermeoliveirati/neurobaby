@@ -54,6 +54,13 @@ export function substituirEstado(dados) {
   setEstado(() => normalizar(dados), { silencioso: true })
 }
 
+// Sair: apaga os dados deste aparelho e volta para a tela de boas-vindas
+export function limparEstado() {
+  estado = structuredClone(ESTADO_INICIAL)
+  try { localStorage.removeItem(KEY) } catch { /* ignora */ }
+  emitir()
+}
+
 export function onSalvar(fn) {
   aoSalvar.add(fn)
   return () => aoSalvar.delete(fn)

@@ -310,3 +310,9 @@ input, select, textarea { font: inherit; color: var(--texto); }
 @media (min-width: 768px) {
   .painel > :only-child, .painel > .dica:has(+ .card-info) { grid-column: 1 / -1; }
 }
+
+/* Sair */
+.btn-sair { border: 1px solid #f3c9d1; background: var(--card); color: var(--perigo); box-shadow: none; }
+.btn-sair-forte { background: var(--perigo); color: #fff; border: 0; }
+.tela > .btn-sair { width: 100%; max-width: 640px; align-self: center; }
+.entrar-google { display: flex; flex-direction: column; gap: 10px; text-align: center; }

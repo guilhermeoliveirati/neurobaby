@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Settings, Trash2, Plus, Check, Phone, Share2, Cloud, CloudOff, Upload, Download, RefreshCw } from 'lucide-react'
-import { useEstado, addItem, delItem, updItem, setEstado, getEstado, mesclar, substituirEstado } from '../data/store'
+import { Settings, Trash2, Plus, Check, Phone, Share2, Cloud, CloudOff, Upload, Download, RefreshCw, LogOut } from 'lucide-react'
+import { useEstado, addItem, delItem, updItem, setEstado, getEstado, mesclar, substituirEstado, limparEstado } from '../data/store'
 import { VACINAS_GESTANTE, VACINAS_BEBE, FAQ } from '../data/conteudo'
 import { fmtData, hojeISO, baixarArquivo, idadeBebe } from '../utils'
 import * as drive from '../data/drive'
@@ -32,6 +32,7 @@ function Menu() {
         <ItemLista icone="💜" cor="rosa" titulo="Sobre o NeuroBaby" href="#/mais/sobre" />
         <ItemLista icone="⚙️" cor="azul" titulo="Configurações" sub="Backup, Google Drive e versão" href="#/mais/backup" />
       </div>
+      <BotaoSair />
       <div className="card card-verde rodape-card">
         <p>Uma jornada única,<br />com todo o nosso cuidado. 💜</p>
       </div>
@@ -293,6 +294,50 @@ function Backup() {
         <div><span>Criado por</span><strong>Guilherme Oliveira</strong></div>
         <div><span>Versão</span><strong>{__APP_VERSION__}</strong></div>
       </div>
+
+      <BotaoSair />
     </div>
+  )
+}
+
+// Sair: envia o que faltar para o Google Drive, encerra a sessão e apaga os dados deste aparelho
+function BotaoSair() {
+  const st = useDrive()
+  const [aberta, setAberta] = useState(false)
+  const [ocupado, setOcupado] = useState(false)
+
+  async function sair() {
+    setOcupado(true)
+    if (st.conectado) {
+      try { await drive.sincronizar() } catch (e) {
+        setOcupado(false)
+        if (!confirm(`Não foi possível salvar no Google Drive (${e.message}). As últimas alterações deste aparelho serão perdidas. Sair mesmo assim?`)) return
+      }
+    }
+    drive.sair()
+    limparEstado()
+    setAberta(false)
+    ir('inicio')
+  }
+
+  return (
+    <>
+      <button className="btn btn-sair btn-largo" onClick={() => setAberta(true)}><LogOut size={18} /> Sair</button>
+      <Folha titulo="Sair do NeuroBaby" aberta={aberta} onFechar={() => setAberta(false)}>
+        <div className="form">
+          {st.conectado ? (
+            <p className="muted">Antes de sair, seus dados são salvos no Google Drive. Para recuperá-los, entre de novo com a mesma conta Google.</p>
+          ) : (
+            <>
+              <p className="selo-grande nivel-atencao">O Google Drive não está conectado. Ao sair, seus dados serão apagados deste aparelho.</p>
+              <p className="muted pequeno">Para não perder nada, conecte o Google Drive em Configurações ou exporte um arquivo de backup antes.</p>
+              <button className="btn btn-largo" onClick={() => baixarArquivo(`neurobaby-backup-${hojeISO()}.json`, JSON.stringify(getEstado(), null, 2), 'application/json')}><Download size={16} /> Exportar backup</button>
+            </>
+          )}
+          <button className="btn btn-sair-forte btn-largo" disabled={ocupado} onClick={sair}><LogOut size={18} /> {ocupado ? 'Salvando…' : 'Sair'}</button>
+          <button className="btn btn-texto btn-largo" onClick={() => setAberta(false)}>Cancelar</button>
+        </div>
+      </Folha>
+    </>
   )
 }
