@@ -5,15 +5,20 @@ const KEY = 'neurobaby:dados'
 
 export const ESTADO_INICIAL = {
   versao: 1,
-  perfil: { nome: '', dum: '', dpp: '', nascimentoBebe: '', nomeBebe: '', sexoBebe: '' },
+  perfil: { nome: '', dum: '', dpp: '', nascimentoBebe: '', nomeBebe: '', sexoBebe: '', plano: '', convenio: '', cidade: '', whatsSaude: '' },
   glicemias: [],   // { id, ts, valor, momento, obs }
+  pressoes: [],    // { id, ts, sis, dia, pulso, obs }
   medicacoes: [],  // { id, nome, dose, horario, obs, ativo }
-  exames: [],      // { id, nome, data, resultado, obs }
+  exames: [],      // { id, nome, data, resultado, obs, fotos: [idFoto] } (fotos ficam no IndexedDB)
   registros: [],   // { id, data, peso, pressao, obs }  (evolução da gestação)
-  consultas: [],   // { id, data, hora, profissional, local, obs, feita }
+  consultas: [],   // { id, tipo: 'consulta'|'exame', data, hora, profissional, local, obs, feita }
   vacinas: {},     // { [idVacina]: 'aaaa-mm-dd' }
   marcos: {},      // { [idMarco]: 'aaaa-mm-dd' }
   notas: '',       // orientações nutricionais pessoais
+  respostasMarcos: {}, // { [idMarco]: 'nao' } quando a mãe responde que o bebê ainda não faz
+  antecedentes: { respostas: {}, outras: [] }, // respostas: { [idDoenca]: { eu, familia, quem } }; outras: [{ id, nome, quem }]
+  lembretes: [],   // { id, tipo, horarios: ['08:00'] } — lembretes enviados para a agenda do celular
+  tutorialVisto: '', // versão do passo a passo já visto
   atualizadoEm: 0,
 }
 
@@ -27,7 +32,11 @@ function carregar() {
 
 export function normalizar(d) {
   const base = structuredClone(ESTADO_INICIAL)
-  return { ...base, ...d, perfil: { ...base.perfil, ...(d?.perfil || {}) } }
+  return {
+    ...base, ...d,
+    perfil: { ...base.perfil, ...(d?.perfil || {}) },
+    antecedentes: { ...base.antecedentes, ...(d?.antecedentes || {}) },
+  }
 }
 
 let estado = carregar()
@@ -87,13 +96,19 @@ export function delItem(lista, id) {
 export function mesclar(atual, outro) {
   const o = normalizar(outro)
   const r = { ...atual }
-  for (const k of ['glicemias', 'medicacoes', 'exames', 'registros', 'consultas']) {
+  for (const k of ['glicemias', 'pressoes', 'medicacoes', 'exames', 'registros', 'consultas', 'lembretes']) {
     const mapa = new Map(atual[k].map((x) => [x.id, x]))
     o[k].forEach((x) => mapa.set(x.id, x))
     r[k] = [...mapa.values()]
   }
   r.vacinas = { ...atual.vacinas, ...o.vacinas }
   r.marcos = { ...atual.marcos, ...o.marcos }
+  r.respostasMarcos = { ...o.respostasMarcos, ...atual.respostasMarcos }
+  r.antecedentes = {
+    respostas: { ...o.antecedentes.respostas, ...atual.antecedentes.respostas },
+    outras: [...new Map([...o.antecedentes.outras, ...atual.antecedentes.outras].map((x) => [x.id, x])).values()],
+  }
+  r.tutorialVisto = atual.tutorialVisto || o.tutorialVisto
   r.perfil = { ...o.perfil, ...Object.fromEntries(Object.entries(atual.perfil).filter(([, v]) => v)) }
   r.notas = atual.notas || o.notas
   return r

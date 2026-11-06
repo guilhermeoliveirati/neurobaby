@@ -8,11 +8,14 @@ import Gestacao from './screens/Gestacao'
 import Diabetes from './screens/Diabetes'
 import Desenvolvimento from './screens/Desenvolvimento'
 import Mais from './screens/Mais'
+import Relatorio from './screens/Relatorio'
+import Tour, { precisaTour } from './components/Tour'
 
-const ABA_DA_ROTA = { inicio: 'inicio', diabetes: 'inicio', gestacao: 'gestacao', desenvolvimento: 'desenvolvimento', mais: 'mais' }
+const ABA_DA_ROTA = { inicio: 'inicio', diabetes: 'inicio', gestacao: 'gestacao', desenvolvimento: 'desenvolvimento', mais: 'mais', relatorio: 'mais' }
 
 export default function App() {
-  const { perfil } = useEstado()
+  const estado = useEstado()
+  const { perfil } = estado
   const [rota, sub] = useRota()
   const pagina = ABA_DA_ROTA[rota] ? rota : 'inicio'
   const [abrindo, setAbrindo] = useState(!rota)
@@ -26,10 +29,11 @@ export default function App() {
 
   if (!perfil.nome) return <div className="app"><BoasVindas /></div>
   if (abrindo) return <div className="app"><Splash /></div>
+  if (pagina === 'relatorio') return <div className="app app-relatorio"><Relatorio /></div>
 
   const telas = {
     inicio: <Inicio />,
-    gestacao: <Gestacao />,
+    gestacao: <Gestacao sub={sub} />,
     diabetes: <Diabetes sub={sub} />,
     desenvolvimento: <Desenvolvimento />,
     mais: <Mais sub={sub} />,
@@ -39,6 +43,7 @@ export default function App() {
     <div className="app com-nav">
       <main key={`${pagina}/${sub || ''}`}>{telas[pagina]}</main>
       <Navegacao atual={ABA_DA_ROTA[pagina]} />
+      {precisaTour(estado) && <Tour estado={estado} />}
     </div>
   )
 }

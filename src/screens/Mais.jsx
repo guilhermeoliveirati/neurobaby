@@ -6,6 +6,9 @@ import { fmtData, hojeISO, baixarArquivo, idadeBebe } from '../utils'
 import * as drive from '../data/drive'
 import { Topo, ItemLista, Folha, Campo, Vazio, ir } from '../components/ui'
 import { FormPerfil, Logo } from './Abertura'
+import { Lembretes, Antecedentes, Atendimento } from './Apoio'
+import { BotoesAgenda } from '../components/Agenda'
+import { eventoConsulta } from '../agenda'
 
 export default function Mais({ sub }) {
   if (sub === 'perfil') return <Perfil />
@@ -15,6 +18,9 @@ export default function Mais({ sub }) {
   if (sub === 'contato') return <Contato />
   if (sub === 'sobre') return <Sobre />
   if (sub === 'backup') return <Backup />
+  if (sub === 'lembretes') return <Lembretes />
+  if (sub === 'antecedentes') return <Antecedentes />
+  if (sub === 'atendimento') return <Atendimento />
   return <Menu />
 }
 
@@ -25,7 +31,11 @@ function Menu() {
         direita={<button className="icone-btn" onClick={() => ir('mais/backup')} aria-label="Configurações"><Settings size={22} /></button>} />
       <div className="lista">
         <ItemLista icone="👤" cor="lilas" titulo="Meu Perfil e Histórico" href="#/mais/perfil" />
-        <ItemLista icone="📅" cor="rosa" titulo="Calendário de Consultas" href="#/mais/consultas" />
+        <ItemLista icone="📅" cor="rosa" titulo="Consultas e exames" sub="Agende e leve para a agenda do celular" href="#/mais/consultas" />
+        <ItemLista icone="⏰" cor="verde" titulo="Lembretes" sub="Pressão, glicemia, refeições" href="#/mais/lembretes" />
+        <ItemLista icone="🧬" cor="lilas" titulo="Meus antecedentes familiares" sub="Questionário de saúde da família" href="#/mais/antecedentes" />
+        <ItemLista icone="📍" cor="azul" titulo="Encontrar atendimento" sub="Convênio ou SUS perto de você" href="#/mais/atendimento" />
+        <ItemLista icone="📄" cor="rosa" titulo="Relatório para o médico" sub="Exames com fotos, glicemia e pressão" href="#/relatorio" />
         <ItemLista icone="💉" cor="verde" titulo="Vacinação" href="#/mais/vacinacao" />
         <ItemLista icone="❓" cor="lilas" titulo="Perguntas Frequentes" href="#/mais/faq" />
         <ItemLista icone="🎧" cor="azul" titulo="Fale Conosco" href="#/mais/contato" />
@@ -61,7 +71,8 @@ function Perfil() {
 function Consultas() {
   const s = useEstado()
   const [form, setForm] = useState(false)
-  const vazio = { data: hojeISO(), hora: '', profissional: '', local: '', obs: '' }
+  const vazio = { tipo: 'consulta', data: hojeISO(), hora: '', profissional: '', local: '', obs: '' }
+  const [agendada, setAgendada] = useState(null)
   const [f, setF] = useState(vazio)
   const muda = (k) => (e) => setF({ ...f, [k]: e.target.value })
   const hoje = hojeISO()
@@ -72,6 +83,7 @@ function Consultas() {
   function salvar(e) {
     e.preventDefault()
     addItem('consultas', { ...f, feita: false })
+    setAgendada({ ...f })
     setF(vazio)
     setForm(false)
   }
@@ -80,9 +92,10 @@ function Consultas() {
     <div className={`card registro ${c.feita ? 'inativo' : ''}`}>
       <div className="data-bloco"><strong>{fmtData(c.data).slice(0, 2)}</strong><small>{new Date(c.data + 'T12:00').toLocaleDateString('pt-BR', { month: 'short' })}</small></div>
       <div>
-        <strong>{c.profissional || 'Consulta'}</strong>
+        <strong>{c.tipo === 'exame' ? '🧪 ' : ''}{c.profissional || (c.tipo === 'exame' ? 'Exame' : 'Consulta')}</strong>
         <small>{[c.hora, c.local].filter(Boolean).join(' · ')}</small>
         {c.obs && <p>{c.obs}</p>}
+        {!c.feita && c.data >= hoje && <BotoesAgenda nome={`consulta-${c.data}`} eventos={[eventoConsulta(c)]} pequeno />}
       </div>
       <button className={`icone-btn ${c.feita ? 'verde' : ''}`} onClick={() => updItem('consultas', c.id, { feita: !c.feita })} aria-label="Marcar como realizada" title="Realizada"><Check size={20} /></button>
       <button className="icone-btn" onClick={() => confirm('Excluir esta consulta?') && delItem('consultas', c.id)} aria-label="Excluir"><Trash2 size={18} /></button>
@@ -91,20 +104,34 @@ function Consultas() {
 
   return (
     <div className="tela">
-      <Topo titulo="Calendário de Consultas" />
-      <button className="btn btn-primario btn-largo" onClick={() => setForm(true)}><Plus size={18} /> Agendar consulta</button>
+      <Topo titulo="Consultas e exames" />
+      <button className="btn btn-primario btn-largo" onClick={() => setForm(true)}><Plus size={18} /> Agendar consulta ou exame</button>
       <h2 className="titulo-secao">Próximas</h2>
       {proximas.length === 0 ? <Vazio>Nenhuma consulta agendada.</Vazio> : <div className="registros">{proximas.map((c) => <Item key={c.id} c={c} />)}</div>}
       {passadas.length > 0 && <h2 className="titulo-secao">Anteriores</h2>}
       {passadas.length > 0 && <div className="registros">{passadas.map((c) => <Item key={c.id} c={c} />)}</div>}
-      <Folha titulo="Agendar consulta" aberta={form} onFechar={() => setForm(false)}>
+      <Folha titulo="Pronto, está agendado! 📅" aberta={!!agendada} onFechar={() => setAgendada(null)}>
+        {agendada && (
+          <div className="form">
+            <p>Quer receber o lembrete no celular? Ele avisa <strong>1 dia antes</strong> e <strong>2 horas antes</strong>.</p>
+            <BotoesAgenda nome={`consulta-${agendada.data}`} eventos={[eventoConsulta(agendada)]} />
+            <button className="btn btn-texto btn-largo" onClick={() => setAgendada(null)}>Agora não</button>
+          </div>
+        )}
+      </Folha>
+      <Folha titulo="Agendar" aberta={form} onFechar={() => setForm(false)}>
         <form className="form" onSubmit={salvar}>
+          <div className="abas">
+            <button type="button" className={f.tipo === 'consulta' ? 'ativa' : ''} onClick={() => setF({ ...f, tipo: 'consulta' })}>Consulta</button>
+            <button type="button" className={f.tipo === 'exame' ? 'ativa' : ''} onClick={() => setF({ ...f, tipo: 'exame' })}>Exame</button>
+          </div>
           <div className="duas-col">
             <Campo rotulo="Data"><input type="date" required value={f.data} onChange={muda('data')} /></Campo>
             <Campo rotulo="Hora"><input type="time" value={f.hora} onChange={muda('hora')} /></Campo>
           </div>
-          <Campo rotulo="Profissional / especialidade">
-            <input list="profs" value={f.profissional} onChange={muda('profissional')} placeholder="Ex.: Obstetra" />
+          <Campo rotulo={f.tipo === 'exame' ? 'Exame' : 'Profissional / especialidade'}>
+            <input list={f.tipo === 'exame' ? 'exames-agenda' : 'profs'} value={f.profissional} onChange={muda('profissional')} placeholder={f.tipo === 'exame' ? 'Ex.: Ultrassom morfológico' : 'Ex.: Obstetra'} />
+            <datalist id="exames-agenda">{['Ultrassom obstétrico', 'Ultrassom morfológico', 'TOTG 75g (curva glicêmica)', 'Exames de sangue', 'Exame de urina', 'Cardiotocografia'].map((p) => <option key={p} value={p} />)}</datalist>
             <datalist id="profs">{['Obstetra', 'Endocrinologista', 'Nutricionista', 'Ultrassom', 'Pediatra', 'Enfermagem (pré-natal)'].map((p) => <option key={p} value={p} />)}</datalist>
           </Campo>
           <Campo rotulo="Local"><input value={f.local} onChange={muda('local')} /></Campo>
@@ -223,6 +250,7 @@ function Backup() {
     const dados = await drive.baixarDoDrive()
     if (!confirm('Substituir os dados deste aparelho pelo backup do Google Drive?')) throw new Error('Restauração cancelada.')
     substituirEstado(dados)
+    await drive.baixarFotos(dados)
   }, 'Dados restaurados do Google Drive!')
 
   function exportar() {
@@ -289,6 +317,8 @@ function Backup() {
         </form>
       </Folha>
 
+      <button className="btn btn-largo" onClick={() => { setEstado({ tutorialVisto: 'novo' }); ir('inicio') }}>🧭 Ver o passo a passo de novo</button>
+
       <h2 className="titulo-secao">Sobre o app</h2>
       <div className="card info-app">
         <div><span>Criado por</span><strong>Guilherme Oliveira</strong></div>
@@ -316,6 +346,7 @@ function BotaoSair() {
     }
     drive.sair()
     limparEstado()
+    apagarTodasFotos().catch(() => {})
     setAberta(false)
     ir('inicio')
   }

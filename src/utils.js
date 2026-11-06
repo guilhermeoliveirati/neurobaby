@@ -81,6 +81,14 @@ export function statusGlicemia(valor, momentoId) {
   return { nivel: 'ok', texto: 'Na meta' }
 }
 
+// Classificação da pressão arterial na gestação
+export function statusPressao(sis, dia) {
+  if (sis >= 160 || dia >= 110) return { nivel: 'perigo', texto: 'Muito alta — procure atendimento' }
+  if (sis >= 140 || dia >= 90) return { nivel: 'atencao', texto: 'Alta — avise sua equipe' }
+  if (sis < 90 || dia < 60) return { nivel: 'atencao', texto: 'Baixa — atenção a tonturas' }
+  return { nivel: 'ok', texto: 'Normal' }
+}
+
 export function filtrarPeriodo(lista, periodo, campoTs = 'ts') {
   if (periodo === 'todos') return lista
   const agora = new Date()

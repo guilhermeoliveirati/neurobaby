@@ -66,7 +66,8 @@ export function Abas({ opcoes, valor, onChange }) {
 export function ItemLista({ icone, cor = 'rosa', titulo, sub, onClick, href, direita }) {
   const Tag = href ? 'a' : 'button'
   return (
-    <Tag className="item-lista" href={href} onClick={onClick}>
+    <Tag className="item-lista" href={href} onClick={onClick}
+      {...(href?.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
       {icone && <span className={`item-icone bg-${cor}`}>{icone}</span>}
       <span className="item-texto">
         <strong>{titulo}</strong>
@@ -115,7 +116,8 @@ export function Vazio({ children }) {
 
 // Gráfico de linha simples em SVG; faixa opcional destaca a meta.
 // Usa a largura real do cartão: no tablet o gráfico fica mais largo em vez de só ampliar.
-export function GraficoLinha({ pontos, meta, unidade = '', altura = 160 }) {
+// pontos2/meta2 (opcionais): segunda linha, por exemplo a pressão diastólica
+export function GraficoLinha({ pontos, meta, pontos2, meta2, unidade = '', altura = 160 }) {
   const caixa = useRef(null)
   const [largura, setLargura] = useState(320)
   useEffect(() => {
@@ -128,19 +130,21 @@ export function GraficoLinha({ pontos, meta, unidade = '', altura = 160 }) {
     <div ref={caixa}>
       {pontos.length < 2
         ? <Vazio>Registre ao menos 2 valores para ver o gráfico.</Vazio>
-        : <Linha pontos={pontos} meta={meta} unidade={unidade} L={largura} A={largura > 520 ? Math.round(altura * 1.4) : altura} />}
+        : <Linha pontos={pontos} meta={meta} pontos2={pontos2} meta2={meta2} unidade={unidade} L={largura} A={largura > 520 ? Math.round(altura * 1.4) : altura} />}
     </div>
   )
 }
 
-function Linha({ pontos, meta, unidade, L, A }) {
+function Linha({ pontos, meta, pontos2 = [], meta2, unidade, L, A }) {
   const pad = { e: 34, d: 10, t: 12, b: 22 }
-  const xs = pontos.map((p) => p.x), ys = pontos.map((p) => p.y)
+  const todos = [...pontos, ...pontos2]
+  const xs = todos.map((p) => p.x), ys = todos.map((p) => p.y)
+  const metas = [meta, meta2].filter((m) => m != null)
   const minX = Math.min(...xs), maxX = Math.max(...xs)
-  const minY = Math.floor(Math.min(...ys, meta ?? Infinity) * 0.9), maxY = Math.ceil(Math.max(...ys, meta ?? -Infinity) * 1.08)
+  const minY = Math.floor(Math.min(...ys, ...metas) * 0.9), maxY = Math.ceil(Math.max(...ys, ...metas) * 1.08)
   const px = (x) => pad.e + ((x - minX) / (maxX - minX || 1)) * (L - pad.e - pad.d)
   const py = (y) => A - pad.b - ((y - minY) / (maxY - minY || 1)) * (A - pad.t - pad.b)
-  const d = pontos.map((p, i) => `${i ? 'L' : 'M'}${px(p.x).toFixed(1)},${py(p.y).toFixed(1)}`).join(' ')
+  const caminho = (l) => l.map((p, i) => `${i ? 'L' : 'M'}${px(p.x).toFixed(1)},${py(p.y).toFixed(1)}`).join(' ')
   const marcas = [minY, Math.round((minY + maxY) / 2), maxY]
   return (
     <svg viewBox={`0 0 ${L} ${A}`} className="grafico" role="img" aria-label="Gráfico de evolução">
@@ -150,12 +154,16 @@ function Linha({ pontos, meta, unidade, L, A }) {
           <text x={pad.e - 6} y={py(v) + 4} textAnchor="end" className="eixo">{v}</text>
         </g>
       ))}
-      {meta != null && <line x1={pad.e} x2={L - pad.d} y1={py(meta)} y2={py(meta)} className="linha-meta" />}
-      <path d={d} className="linha" />
-      {pontos.map((p, i) => (
-        <circle key={i} cx={px(p.x)} cy={py(p.y)} r="3.5" className={`ponto ${p.classe || ''}`}>
-          <title>{`${p.rotulo ?? ''} ${p.y}${unidade}`}</title>
-        </circle>
+      {metas.map((m) => <line key={m} x1={pad.e} x2={L - pad.d} y1={py(m)} y2={py(m)} className="linha-meta" />)}
+      {[[pontos, ''], [pontos2, 'serie2']].map(([lista, cls]) => lista.length > 0 && (
+        <g key={cls || 's1'} className={cls}>
+          <path d={caminho(lista)} className="linha" />
+          {lista.map((p, i) => (
+            <circle key={i} cx={px(p.x)} cy={py(p.y)} r="3.5" className={`ponto ${p.classe || ''}`}>
+              <title>{`${p.rotulo ?? ''} ${p.y}${unidade}`}</title>
+            </circle>
+          ))}
+        </g>
       ))}
       <text x={pad.e} y={A - 4} className="eixo">{pontos[0].rotuloX}</text>
       <text x={L - pad.d} y={A - 4} textAnchor="end" className="eixo">{pontos[pontos.length - 1].rotuloX}</text>

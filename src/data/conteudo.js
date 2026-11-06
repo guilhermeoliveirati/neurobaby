@@ -85,15 +85,72 @@ export const FAIXAS = [
   { id: 'm24', de: 24, ate: 36, nome: '2 a 3 anos' },
 ]
 
+// [nome, emoji, por que é importante]
 export const MARCOS = {
-  m0: [['Fixa o olhar no rosto', '👀'], ['Acalma-se com a voz', '🎵'], ['Movimenta braços e pernas', '🤸'], ['Levanta a cabeça de bruços', '👶'], ['Reage a sons altos', '👂'], ['Sorri ao dormir', '😊']],
-  m2: [['Sustenta a cabeça', '👶'], ['Sorri com frequência', '😊'], ['Segue objetos com o olhar', '👀'], ['Emite sons (aaa, ooo)', '🗣️'], ['Leva as mãos à boca', '✋'], ['Reconhece a mãe', '💜']],
-  m4: [['Inicia o rolar', '🔄'], ['Reconhece rostos', '👨‍👩‍👧'], ['Emite sons e gargalhadas', '😄'], ['Explora objetos', '🧸'], ['Pega objetos com as mãos', '✋'], ['Vira a cabeça para sons', '👂']],
-  m6: [['Senta sem apoio', '🪑'], ['Balbucia (mamã, papá)', '🗣️'], ['Passa objetos de uma mão a outra', '🤲'], ['Estranha desconhecidos', '🙈'], ['Atende pelo nome', '📣'], ['Começa a engatinhar', '🐾']],
-  m9: [['Fica em pé com apoio', '🧍'], ['Faz pinça com os dedos', '🤏'], ['Dá tchau e bate palmas', '👋'], ['Procura objeto escondido', '🔍'], ['Fala primeiras palavras', '💬'], ['Imita gestos', '🪞']],
-  m12: [['Anda sozinho', '🚶'], ['Fala algumas palavras', '💬'], ['Aponta o que quer', '👉'], ['Empilha 2 blocos', '🧱'], ['Bebe no copo', '🥛'], ['Brinca de faz de conta', '🧸']],
-  m18: [['Corre', '🏃'], ['Junta 2 palavras', '💬'], ['Chuta bola', '⚽'], ['Rabisca com lápis', '✏️'], ['Segue ordens simples', '👂'], ['Come de colher sozinho', '🥄']],
-  m24: [['Fala frases curtas', '🗨️'], ['Sobe escadas alternando pés', '🪜'], ['Brinca com outras crianças', '👫'], ['Reconhece cores', '🎨'], ['Controla o xixi de dia', '🚽'], ['Conta pequenas histórias', '📖']],
+  m0: [
+    ['Fixa o olhar no rosto', '👀', 'Olhar para rostos é o começo da comunicação e do vínculo. Mostra que a visão e a atenção estão se desenvolvendo.'],
+    ['Acalma-se com a voz', '🎵', 'Reconhecer a voz da mãe (ouvida desde a barriga) traz segurança e mostra que a audição e o vínculo estão funcionando.'],
+    ['Movimenta braços e pernas', '🤸', 'Movimentos dos dois lados do corpo, com a mesma força, indicam que músculos e sistema nervoso estão trabalhando bem.'],
+    ['Levanta a cabeça de bruços', '👶', 'Fortalece pescoço e costas, a base para rolar, sentar e engatinhar depois.'],
+    ['Reage a sons altos', '👂', 'Assustar-se ou piscar com barulhos mostra que o bebê está ouvindo. A audição é essencial para aprender a falar.'],
+    ['Sorri ao dormir', '😊', 'Os primeiros sorrisos (reflexos) preparam o sorriso social, que aparece por volta de 2 meses.'],
+  ],
+  m2: [
+    ['Sustenta a cabeça', '👶', 'Controlar a cabeça é o primeiro grande marco motor: permite olhar ao redor e prepara para sentar.'],
+    ['Sorri com frequência', '😊', 'O sorriso social mostra que o bebê reconhece pessoas e quer interagir. É um sinal importante do desenvolvimento emocional.'],
+    ['Segue objetos com o olhar', '👀', 'Acompanhar objetos mostra que visão e coordenação dos olhos estão amadurecendo.'],
+    ['Emite sons (aaa, ooo)', '🗣️', 'Os primeiros sons são o início da linguagem. Responder a eles ensina ao bebê como funciona uma conversa.'],
+    ['Leva as mãos à boca', '✋', 'Mostra que o bebê começa a coordenar os movimentos e a se acalmar sozinho.'],
+    ['Reconhece a mãe', '💜', 'Reagir diferente à mãe mostra memória e vínculo afetivo, base da segurança emocional.'],
+  ],
+  m4: [
+    ['Inicia o rolar', '🔄', 'Rolar fortalece o corpo e é o primeiro jeito de o bebê se deslocar sozinho.'],
+    ['Reconhece rostos', '👨‍👩‍👧', 'Diferenciar pessoas conhecidas mostra memória e desenvolvimento social.'],
+    ['Emite sons e gargalhadas', '😄', 'Gargalhar e "conversar" mostram interação social e evolução da linguagem.'],
+    ['Explora objetos', '🧸', 'Explorar com mãos e boca é como o bebê aprende sobre formas, texturas e o mundo.'],
+    ['Pega objetos com as mãos', '✋', 'Coordenação entre olhos e mãos: base para comer sozinho, desenhar e escrever no futuro.'],
+    ['Vira a cabeça para sons', '👂', 'Procurar de onde vem o som mostra que a audição está boa. Se o bebê não reage a sons, a audição precisa ser avaliada.'],
+  ],
+  m6: [
+    ['Senta sem apoio', '🪑', 'Sentar libera as mãos para brincar e muda a forma como o bebê vê e explora o mundo.'],
+    ['Balbucia (mamã, papá)', '🗣️', 'Repetir sílabas é o treino para as primeiras palavras. Converse e responda ao balbucio.'],
+    ['Passa objetos de uma mão a outra', '🤲', 'Mostra coordenação entre os dois lados do corpo e do cérebro.'],
+    ['Estranha desconhecidos', '🙈', 'É um sinal saudável: o bebê sabe quem são as pessoas de confiança dele.'],
+    ['Atende pelo nome', '📣', 'Responder ao nome mostra audição, atenção e interesse social. A ausência pode ser um sinal de alerta.'],
+    ['Começa a engatinhar', '🐾', 'Engatinhar fortalece o corpo e ajuda na coordenação. Alguns bebês pulam essa fase, e tudo bem.'],
+  ],
+  m9: [
+    ['Fica em pé com apoio', '🧍', 'Prepara pernas e equilíbrio para os primeiros passos.'],
+    ['Faz pinça com os dedos', '🤏', 'Pegar coisas pequenas com o polegar e o indicador é um grande avanço da coordenação fina.'],
+    ['Dá tchau e bate palmas', '👋', 'Imitar gestos mostra que o bebê aprende observando e quer se comunicar.'],
+    ['Procura objeto escondido', '🔍', 'Entender que as coisas continuam existindo quando não estão à vista é um passo importante do raciocínio.'],
+    ['Fala primeiras palavras', '💬', 'As primeiras palavras com sentido mostram que a linguagem está se formando.'],
+    ['Imita gestos', '🪞', 'Imitar é a principal forma de aprender nos primeiros anos.'],
+  ],
+  m12: [
+    ['Anda sozinho', '🚶', 'Andar dá independência. Pode acontecer entre 9 e 18 meses; cada criança tem seu tempo.'],
+    ['Fala algumas palavras', '💬', 'O vocabulário em crescimento mostra que a criança entende e quer se comunicar.'],
+    ['Aponta o que quer', '👉', 'Apontar para mostrar algo é um marco importante da comunicação social. A ausência pode ser um sinal de alerta.'],
+    ['Empilha 2 blocos', '🧱', 'Mostra controle das mãos e noção de espaço.'],
+    ['Bebe no copo', '🥛', 'Coordenação e autonomia nas tarefas do dia a dia.'],
+    ['Brinca de faz de conta', '🧸', 'Imaginar mostra criatividade e um pensamento mais elaborado.'],
+  ],
+  m18: [
+    ['Corre', '🏃', 'Mostra força, equilíbrio e coordenação do corpo.'],
+    ['Junta 2 palavras', '💬', 'Frases curtas ("quer água") mostram que a linguagem está avançando.'],
+    ['Chuta bola', '⚽', 'Exige equilíbrio em um pé só e coordenação.'],
+    ['Rabisca com lápis', '✏️', 'Prepara as mãos para desenhar e, no futuro, escrever.'],
+    ['Segue ordens simples', '👂', 'Entender pedidos mostra compreensão da linguagem e atenção.'],
+    ['Come de colher sozinho', '🥄', 'Autonomia e coordenação entre olhos, mãos e boca.'],
+  ],
+  m24: [
+    ['Fala frases curtas', '🗨️', 'Frases mostram que a criança organiza pensamentos e se comunica bem.'],
+    ['Sobe escadas alternando pés', '🪜', 'Sinal de equilíbrio e coordenação motora mais madura.'],
+    ['Brinca com outras crianças', '👫', 'Brincar junto ensina a dividir, esperar e lidar com emoções.'],
+    ['Reconhece cores', '🎨', 'Mostra atenção aos detalhes e aprendizado de conceitos.'],
+    ['Controla o xixi de dia', '🚽', 'Mostra amadurecimento do corpo e autonomia. Cada criança tem o seu tempo.'],
+    ['Conta pequenas histórias', '📖', 'Contar o que aconteceu mostra memória, linguagem e imaginação.'],
+  ],
 }
 
 export const ATIVIDADES = {

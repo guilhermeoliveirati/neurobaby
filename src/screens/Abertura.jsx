@@ -40,7 +40,7 @@ export function FormPerfil({ aoSalvar, textoBotao = 'Salvar' }) {
 
   function salvar(e) {
     e.preventDefault()
-    const final = fase === 'gestante' ? { ...p, nascimentoBebe: '' } : p
+    const final = { ...(fase === 'gestante' ? { ...p, nascimentoBebe: '' } : p), plano: p.plano || 'sus' }
     setEstado((s) => ({ ...s, perfil: final }))
     aoSalvar?.()
   }
@@ -72,6 +72,16 @@ export function FormPerfil({ aoSalvar, textoBotao = 'Salvar' }) {
       <Campo rotulo="Nome do bebê (opcional)">
         <input value={p.nomeBebe} onChange={muda('nomeBebe')} />
       </Campo>
+      <span className="rotulo-solto">Seu atendimento</span>
+      <div className="abas">
+        <button type="button" className={p.plano !== 'convenio' ? 'ativa' : ''} onClick={() => setP({ ...p, plano: 'sus' })}>SUS</button>
+        <button type="button" className={p.plano === 'convenio' ? 'ativa' : ''} onClick={() => setP({ ...p, plano: 'convenio' })}>Tenho convênio</button>
+      </div>
+      {p.plano === 'convenio' && (
+        <Campo rotulo="Qual convênio?">
+          <input value={p.convenio} onChange={muda('convenio')} placeholder="Ex.: Unimed" />
+        </Campo>
+      )}
       <button className="btn btn-primario btn-largo">{textoBotao}</button>
     </form>
   )
@@ -84,7 +94,7 @@ export function BoasVindas() {
     <div className="tela">
       <Logo pequeno />
       <h2 className="titulo-secao centro">Vamos começar? 💜</h2>
-      <FormPerfil textoBotao="Entrar no NeuroBaby" aoSalvar={() => ir('inicio')} />
+      <FormPerfil textoBotao="Entrar no NeuroBaby" aoSalvar={() => { setEstado({ tutorialVisto: 'novo' }); ir('inicio') }} />
       <EntrarComGoogle />
     </div>
   )
@@ -100,7 +110,12 @@ function EntrarComGoogle() {
     setOcupado(true); setMsg('')
     try {
       const dados = await drive.entrarComBackup()
-      if (dados?.perfil?.nome) { substituirEstado(dados); ir('inicio'); return }
+      if (dados?.perfil?.nome) {
+        substituirEstado(dados)
+        drive.baixarFotos(dados).catch(() => {})
+        ir('inicio')
+        return
+      }
       setMsg('Google conectado. Não achamos dados salvos nesta conta: preencha o cadastro acima para começar.')
     } catch (e) { setMsg(`⚠️ ${e.message}`) }
     setOcupado(false)

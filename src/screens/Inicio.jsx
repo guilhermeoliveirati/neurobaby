@@ -1,7 +1,8 @@
-import { Menu, Bell, CalendarDays, Droplet, Apple, MoreHorizontal, Lightbulb, ChevronRight, Ruler } from 'lucide-react'
+import { Menu, Bell, CalendarDays, Droplet, HeartPulse, MoreHorizontal, Lightbulb, ChevronRight, Ruler } from 'lucide-react'
 import { useEstado } from '../data/store'
 import { DICAS } from '../data/conteudo'
-import { gestacao, tamanhoBebe, fatoSemana, idadeBebe, textoIdade, fmtData, parseData, hojeISO, statusGlicemia } from '../utils'
+import { gestacao, tamanhoBebe, fatoSemana, idadeBebe, textoIdade, fmtData, parseData, hojeISO, statusGlicemia, statusPressao } from '../utils'
+import Feto, { frutaDaSemana } from '../components/Feto'
 import { ir } from '../components/ui'
 
 export default function Inicio() {
@@ -14,6 +15,8 @@ export default function Inicio() {
   const hoje = hojeISO()
   const proxConsulta = s.consultas.filter((c) => !c.feita && c.data >= hoje).sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))[0]
   const ultGlic = [...s.glicemias].sort((a, b) => b.ts - a.ts)[0]
+  const ultPress = [...s.pressoes].sort((a, b) => b.ts - a.ts)[0]
+  const fruta = g ? frutaDaSemana(g.semanas) : null
   const alertas = (proxConsulta ? 1 : 0)
 
   return (
@@ -41,9 +44,10 @@ export default function Inicio() {
           <div>
             <small>Sua gestação está com</small>
             <strong className="numero-grande">{g.semanas} semanas{g.dias ? <em> e {g.dias}d</em> : null}</strong>
+            {fruta && <small className="fruta-texto">Hoje seu bebê está do tamanho de {fruta[0]} {fruta[1]}</small>}
             <small>{g.faltamSemanas > 0 ? `Faltam ${g.faltamSemanas} semanas para conhecer seu bebê!` : 'Seu bebê pode chegar a qualquer momento!'}</small>
           </div>
-          <span className="feto" aria-hidden="true">🤰</span>
+          <span className="feto-mini"><Feto semana={g.semanas} tamanho={104} compacto /></span>
         </a>
       ) : (
         <a className="card card-destaque" href="#/mais/perfil">
@@ -57,7 +61,7 @@ export default function Inicio() {
       <div className="atalhos">
         <button onClick={() => ir('mais/consultas')}><span className="bg-verde"><CalendarDays size={22} /></span>Consultas</button>
         <button onClick={() => ir('diabetes/glicemia')}><span className="bg-rosa"><Droplet size={22} /></span>Glicemias</button>
-        <button onClick={() => ir('diabetes/nutricao')}><span className="bg-verde"><Apple size={22} /></span>Alimentação</button>
+        <button onClick={() => ir('diabetes/pressao')}><span className="bg-verde"><HeartPulse size={22} /></span>Pressão</button>
         <button onClick={() => ir('diabetes')}><span className="bg-lilas"><MoreHorizontal size={22} /></span>Mais</button>
       </div>
 
@@ -70,12 +74,18 @@ export default function Inicio() {
           </div>
         </div>
 
-        {(ultGlic || proxConsulta) && (
+        {(ultGlic || ultPress || proxConsulta) && (
           <div className="resumo-linha">
             {ultGlic && (
               <a className={`card mini nivel-${statusGlicemia(ultGlic.valor, ultGlic.momento).nivel}`} href="#/diabetes/glicemia">
                 <small>Última glicemia</small>
                 <strong>{ultGlic.valor} <em>mg/dL</em></strong>
+              </a>
+            )}
+            {ultPress && (
+              <a className={`card mini nivel-${statusPressao(ultPress.sis, ultPress.dia).nivel}`} href="#/diabetes/pressao">
+                <small>Última pressão</small>
+                <strong>{ultPress.sis}x{ultPress.dia}</strong>
               </a>
             )}
             {proxConsulta && (

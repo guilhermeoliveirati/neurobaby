@@ -1,5 +1,6 @@
 // Backup no Google Drive (pasta oculta appDataFolder, visível só para o app), como no app Glicose.
 import { getEstado, onSalvar } from './store'
+import { lerFoto, gravarFoto, temFoto } from './fotos'
 
 const ARQUIVO = 'neurobaby-backup.json'
 const ESCOPO = 'https://www.googleapis.com/auth/drive.appdata'
@@ -110,6 +111,41 @@ async function enviar(dados) {
     await api(`${UPLOAD}?uploadType=multipart`, { method: 'POST', body: form })
   }
   gravarCfg({ ultimoSync: Date.now(), pendente: false, erro: '' })
+  await enviarFotos(dados)
+}
+
+const idsFotos = (dados) => (dados?.exames || []).flatMap((x) => x.fotos || [])
+
+// Cada foto de exame vira um arquivo foto-<id>.jpg na pasta oculta do app (envia só as novas)
+async function enviarFotos(dados) {
+  const enviadas = new Set(lerCfg().fotosEnviadas || [])
+  for (const id of idsFotos(dados)) {
+    if (enviadas.has(id)) continue
+    const blob = await lerFoto(id).catch(() => null)
+    if (!blob) continue
+    const form = new FormData()
+    form.append('metadata', new Blob([JSON.stringify({ name: `foto-${id}.jpg`, parents: ['appDataFolder'] })], { type: 'application/json' }))
+    form.append('file', blob)
+    await api(`${UPLOAD}?uploadType=multipart`, { method: 'POST', body: form })
+    enviadas.add(id)
+    gravarCfg({ fotosEnviadas: [...enviadas] })
+  }
+}
+
+// Depois de restaurar, baixa as fotos que ainda não estão neste aparelho
+export async function baixarFotos(dados) {
+  const enviadas = new Set(lerCfg().fotosEnviadas || [])
+  for (const id of idsFotos(dados)) {
+    if (await temFoto(id).catch(() => false)) { enviadas.add(id); continue }
+    const q = encodeURIComponent(`name='foto-${id}.jpg'`)
+    const r = await api(`${API}?spaces=appDataFolder&q=${q}&fields=files(id)`)
+    const arq = (await r.json()).files?.[0]
+    if (!arq) continue
+    const b = await (await api(`${API}/${arq.id}?alt=media`)).blob()
+    await gravarFoto(id, b)
+    enviadas.add(id)
+  }
+  gravarCfg({ fotosEnviadas: [...enviadas] })
 }
 
 export async function conectar() {

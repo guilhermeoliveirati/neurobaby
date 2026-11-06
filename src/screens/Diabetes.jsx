@@ -1,12 +1,15 @@
-import { useState } from 'react'
-import { Info, Heart, Trash2, Download, Plus, Pill } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Info, Heart, Trash2, Download, Plus, Pill, Camera, FileText, X } from 'lucide-react'
 import { useEstado, addItem, delItem, updItem, setEstado } from '../data/store'
 import { MOMENTOS, ORIENTACOES } from '../data/conteudo'
-import { statusGlicemia, momento, filtrarPeriodo, fmtDataHora, fmtData, hojeISO, baixarArquivo, gestacao, parseData } from '../utils'
-import { Topo, ItemLista, Folha, Campo, Vazio, GraficoLinha, Abas } from '../components/ui'
+import { REF_PRESSAO, SINAIS_PRESSAO } from '../data/guias'
+import { salvarFotos, apagarFoto, useFotoUrl } from '../data/fotos'
+import { statusPressao, statusGlicemia, momento, filtrarPeriodo, fmtDataHora, fmtData, hojeISO, baixarArquivo, gestacao, parseData } from '../utils'
+import { Topo, ItemLista, Folha, Campo, Vazio, GraficoLinha, Abas, ir } from '../components/ui'
 
 export default function Diabetes({ sub }) {
   if (sub === 'glicemia') return <Glicemia />
+  if (sub === 'pressao') return <Pressao />
   if (sub === 'medicacoes') return <Medicacoes />
   if (sub === 'exames') return <Exames />
   if (sub === 'nutricao') return <Nutricao />
@@ -22,11 +25,12 @@ function Menu() {
       <Topo titulo="Caderneta do Diabetes" icone={<span className="gota">💧</span>}
         direita={<button className="icone-btn" onClick={() => setInfo(true)} aria-label="Sobre a caderneta"><Info size={22} /></button>} />
       <div className="card card-rosa intro">
-        <p>Aqui você registra todas as informações relacionadas ao diabetes gestacional.</p>
+        <p>Aqui você registra glicemia, pressão, medicações e exames da sua gestação.</p>
         <Heart size={22} className="rosa" />
       </div>
       <div className="lista">
         <ItemLista icone="🩸" titulo="Controle Glicêmico" sub={`${s.glicemias.length} medições`} href="#/diabetes/glicemia" />
+        <ItemLista icone="🩺" cor="lilas" titulo="Pressão Arterial" sub={`${s.pressoes.length} aferições`} href="#/diabetes/pressao" />
         <ItemLista icone="💊" cor="lilas" titulo="Medicações" sub={`${s.medicacoes.filter((m) => m.ativo !== false).length} em uso`} href="#/diabetes/medicacoes" />
         <ItemLista icone="🧪" cor="azul" titulo="Exames" sub={`${s.exames.length} registrados`} href="#/diabetes/exames" />
         <ItemLista icone="🍎" cor="verde" titulo="Orientações Nutricionais" href="#/diabetes/nutricao" />
@@ -161,6 +165,107 @@ function FormGlicemia({ aberta, onFechar }) {
   )
 }
 
+function Pressao() {
+  const s = useEstado()
+  const [periodo, setPeriodo] = useState('semana')
+  const [form, setForm] = useState(false)
+  const [info, setInfo] = useState(false)
+
+  const filtradas = filtrarPeriodo(s.pressoes, periodo).sort((a, b) => a.ts - b.ts)
+  const media = (k) => (filtradas.length ? Math.round(filtradas.reduce((t, p) => t + p[k], 0) / filtradas.length) : null)
+  const normais = filtradas.filter((p) => statusPressao(p.sis, p.dia).nivel === 'ok').length
+  const ponto = (p, k) => ({ x: p.ts, y: p[k], rotulo: fmtDataHora(p.ts), rotuloX: fmtDataHora(p.ts).slice(0, 5), classe: `nivel-${statusPressao(p.sis, p.dia).nivel}` })
+
+  function exportar() {
+    const linhas = [['data', 'hora', 'sistolica', 'diastolica', 'pulso', 'status', 'observacao']]
+    ;[...s.pressoes].sort((a, b) => a.ts - b.ts).forEach((p) => {
+      const d = new Date(p.ts)
+      linhas.push([d.toLocaleDateString('pt-BR'), d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        p.sis, p.dia, p.pulso || '', statusPressao(p.sis, p.dia).texto, (p.obs || '').replace(/[;\n]/g, ' ')])
+    })
+    baixarArquivo(`neurobaby-pressao-${hojeISO()}.csv`, '﻿' + linhas.map((l) => l.join(';')).join('\n'), 'text/csv')
+  }
+
+  return (
+    <div className="tela">
+      <Topo titulo="Pressão Arterial" direita={
+        <button className="icone-btn" onClick={exportar} aria-label="Exportar CSV" title="Exportar CSV"><Download size={20} /></button>} />
+      <button className="btn btn-primario btn-largo" onClick={() => setForm(true)}><Plus size={18} /> Nova aferição</button>
+      <Abas opcoes={[['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês'], ['todos', 'Todos']]} valor={periodo} onChange={setPeriodo} />
+
+      <div className="resumo-linha">
+        <div className="card mini"><small>Média</small><strong>{media('sis') ?? '—'}{filtradas.length ? <em> x {media('dia')}</em> : null}</strong></div>
+        <div className="card mini"><small>Normais</small><strong>{filtradas.length ? Math.round((normais / filtradas.length) * 100) : '—'}<em>%</em></strong></div>
+        <div className="card mini"><small>Aferições</small><strong>{filtradas.length}</strong></div>
+      </div>
+      <div className="card">
+        <GraficoLinha pontos={filtradas.map((p) => ponto(p, 'sis'))} meta={140} pontos2={filtradas.map((p) => ponto(p, 'dia'))} meta2={90} unidade=" mmHg" />
+        {filtradas.length >= 2 && <p className="legenda"><i className="l1" />Máxima <i className="l2" />Mínima <i className="lm" />Limite 140 x 90</p>}
+      </div>
+
+      <h2 className="titulo-secao">Aferições</h2>
+      {filtradas.length === 0 ? <Vazio>Nenhuma aferição neste período.</Vazio> : <div className="registros">{[...filtradas].reverse().map((p) => {
+        const st = statusPressao(p.sis, p.dia)
+        return (
+          <div key={p.id} className={`card registro borda-${st.nivel}`}>
+            <div>
+              <strong>{p.sis} x {p.dia} <span className={`selo nivel-${st.nivel}`}>{st.texto}</span></strong>
+              <small>{fmtDataHora(p.ts)}{p.pulso ? ` · pulso ${p.pulso} bpm` : ''}</small>
+              {p.obs && <p>{p.obs}</p>}
+            </div>
+            <button className="icone-btn" onClick={() => confirm('Excluir esta aferição?') && delItem('pressoes', p.id)} aria-label="Excluir"><Trash2 size={18} /></button>
+          </div>
+        )
+      })}</div>}
+
+      <button className="card card-rosa alerta-pressao" onClick={() => setInfo(true)}>
+        <strong>⚠️ Valores de referência e sinais de alerta</strong>
+        <Info size={18} />
+      </button>
+
+      <FormPressao aberta={form} onFechar={() => setForm(false)} />
+      <Folha titulo="Pressão na gestação" aberta={info} onFechar={() => setInfo(false)}>
+        <ul className="metas">{REF_PRESSAO.map(([n, v, nivel]) => <li key={n}><strong className={`selo nivel-${nivel}`}>{n}</strong><span>{v}</span></li>)}</ul>
+        <p className="selo-grande nivel-perigo pequeno">{SINAIS_PRESSAO}</p>
+        <p className="muted pequeno">Afira sentada, depois de 5 minutos de descanso, com o braço apoiado na altura do coração e sem conversar. Siga sempre a orientação da sua equipe de saúde.</p>
+      </Folha>
+    </div>
+  )
+}
+
+function FormPressao({ aberta, onFechar }) {
+  const vazio = () => ({ sis: '', dia: '', pulso: '', quando: agoraLocal(), obs: '' })
+  const [f, setF] = useState(vazio)
+  const muda = (k) => (e) => setF({ ...f, [k]: e.target.value })
+  const sis = Number(f.sis), dia = Number(f.dia)
+  const st = sis > 0 && dia > 0 ? statusPressao(sis, dia) : null
+  function salvar(e) {
+    e.preventDefault()
+    addItem('pressoes', { sis, dia, pulso: Number(f.pulso) || null, ts: new Date(f.quando).getTime(), obs: f.obs })
+    setF(vazio())
+    onFechar()
+  }
+  return (
+    <Folha titulo="Nova aferição" aberta={aberta} onFechar={onFechar}>
+      <form className="form" onSubmit={salvar}>
+        <div className="pressao-campos">
+          <Campo rotulo="Máxima"><input className="input-grande" type="number" inputMode="numeric" min="50" max="260" required autoFocus value={f.sis} onChange={muda('sis')} placeholder="120" /></Campo>
+          <span className="x">x</span>
+          <Campo rotulo="Mínima"><input className="input-grande" type="number" inputMode="numeric" min="30" max="180" required value={f.dia} onChange={muda('dia')} placeholder="80" /></Campo>
+        </div>
+        <p className="dica-campo">No aparelho: 120 x 80 é o mesmo que "12 por 8".</p>
+        {st && <p className={`selo-grande nivel-${st.nivel}`}>{st.texto}</p>}
+        <div className="duas-col">
+          <Campo rotulo="Pulso (opcional)"><input type="number" inputMode="numeric" min="30" max="220" value={f.pulso} onChange={muda('pulso')} placeholder="bpm" /></Campo>
+          <Campo rotulo="Data e hora"><input type="datetime-local" required value={f.quando} onChange={muda('quando')} /></Campo>
+        </div>
+        <Campo rotulo="Observação"><input value={f.obs} onChange={muda('obs')} placeholder="Ex.: com dor de cabeça" /></Campo>
+        <button className="btn btn-primario btn-largo">Salvar aferição</button>
+      </form>
+    </Folha>
+  )
+}
+
 function Medicacoes() {
   const s = useEstado()
   const [form, setForm] = useState(false)
@@ -209,48 +314,105 @@ function Medicacoes() {
 function Exames() {
   const s = useEstado()
   const [form, setForm] = useState(false)
-  const [f, setF] = useState({ nome: '', data: hojeISO(), resultado: '', obs: '' })
+  const [ver, setVer] = useState(null)
+  const vazio = { nome: '', data: hojeISO(), resultado: '', obs: '', fotos: [] }
+  const [f, setF] = useState(vazio)
+  const [salvando, setSalvando] = useState(false)
+  const camera = useRef()
+  const galeria = useRef()
   const muda = (k) => (e) => setF({ ...f, [k]: e.target.value })
   const lista = [...s.exames].sort((a, b) => b.data.localeCompare(a.data))
+
+  async function addFotos(e) {
+    const arqs = [...(e.target.files || [])]
+    e.target.value = ''
+    if (!arqs.length) return
+    setSalvando(true)
+    try {
+      const ids = await salvarFotos(arqs)
+      setF((x) => ({ ...x, fotos: [...x.fotos, ...ids] }))
+    } catch { alert('Não foi possível salvar a foto neste aparelho.') }
+    setSalvando(false)
+  }
+  function tirarFoto(id) {
+    apagarFoto(id).catch(() => {})
+    setF((x) => ({ ...x, fotos: x.fotos.filter((y) => y !== id) }))
+  }
   function salvar(e) {
     e.preventDefault()
     addItem('exames', f)
-    setF({ nome: '', data: hojeISO(), resultado: '', obs: '' })
+    setF(vazio)
     setForm(false)
   }
+  function fechar() {
+    f.fotos.forEach((id) => apagarFoto(id).catch(() => {}))
+    setF(vazio)
+    setForm(false)
+  }
+  function excluir(x) {
+    if (!confirm('Excluir este exame e suas fotos?')) return
+    ;(x.fotos || []).forEach((id) => apagarFoto(id).catch(() => {}))
+    delItem('exames', x.id)
+  }
+
   return (
     <div className="tela">
-      <Topo titulo="Exames" />
-      <button className="btn btn-primario btn-largo" onClick={() => setForm(true)}><Plus size={18} /> Registrar exame</button>
-      {lista.length === 0 ? <Vazio>Nenhum exame registrado. Ex.: hemoglobina glicada, curva glicêmica (TOTG), ultrassom.</Vazio> : <div className="registros">{lista.map((x) => (
-        <div key={x.id} className="card registro">
+      <Topo titulo="Exames" direita={<button className="icone-btn" onClick={() => ir('relatorio')} aria-label="Relatório para o médico" title="Relatório"><FileText size={20} /></button>} />
+      <button className="btn btn-primario btn-largo" onClick={() => setForm(true)}><Camera size={18} /> Registrar exame (com foto)</button>
+      {lista.length > 0 && <button className="btn btn-largo" onClick={() => ir('relatorio')}><FileText size={18} /> Gerar relatório para o médico</button>}
+      {lista.length === 0 ? <Vazio>Nenhum exame registrado. Tire uma foto do resultado e anote o principal: o app junta tudo num relatório.</Vazio> : <div className="registros">{lista.map((x) => (
+        <div key={x.id} className="card registro exame">
           <span className="item-icone bg-azul">🧪</span>
           <div>
             <strong>{x.nome}</strong>
             <small>{fmtData(x.data)}{x.resultado && ` · ${x.resultado}`}</small>
             {x.obs && <p>{x.obs}</p>}
+            {x.fotos?.length > 0 && <div className="miniaturas">{x.fotos.map((id) => <Miniatura key={id} id={id} onClick={() => setVer(id)} />)}</div>}
           </div>
-          <button className="icone-btn" onClick={() => confirm('Excluir este exame?') && delItem('exames', x.id)} aria-label="Excluir"><Trash2 size={18} /></button>
+          <button className="icone-btn" onClick={() => excluir(x)} aria-label="Excluir"><Trash2 size={18} /></button>
         </div>
       ))}</div>}
-      <Folha titulo="Registrar exame" aberta={form} onFechar={() => setForm(false)}>
+
+      <Folha titulo="Registrar exame" aberta={form} onFechar={fechar}>
         <form className="form" onSubmit={salvar}>
+          <div className="fotos-form">
+            {f.fotos.map((id) => (
+              <span key={id} className="foto-item"><Miniatura id={id} /><button type="button" onClick={() => tirarFoto(id)} aria-label="Remover foto"><X size={14} /></button></span>
+            ))}
+            <button type="button" className="foto-add" onClick={() => camera.current.click()} disabled={salvando}><Camera size={22} />{salvando ? 'Salvando…' : 'Tirar foto'}</button>
+            <button type="button" className="foto-add" onClick={() => galeria.current.click()} disabled={salvando}><Plus size={22} />Da galeria</button>
+            <input ref={camera} type="file" accept="image/*" capture="environment" hidden onChange={addFotos} />
+            <input ref={galeria} type="file" accept="image/*" multiple hidden onChange={addFotos} />
+          </div>
           <Campo rotulo="Exame">
             <input required list="exames-comuns" value={f.nome} onChange={muda('nome')} />
             <datalist id="exames-comuns">
-              {['Glicemia de jejum', 'TOTG 75g (curva glicêmica)', 'Hemoglobina glicada (HbA1c)', 'Ultrassom obstétrico', 'Ultrassom morfológico', 'Hemograma', 'Urina tipo 1', 'Urocultura', 'TSH'].map((n) => <option key={n} value={n} />)}
+              {['Glicemia de jejum', 'TOTG 75g (curva glicêmica)', 'Hemoglobina glicada (HbA1c)', 'Ultrassom obstétrico', 'Ultrassom morfológico', 'Hemograma', 'Urina tipo 1', 'Urocultura', 'TSH', 'Tipagem sanguínea', 'Sorologias (HIV, sífilis, hepatites)', 'Toxoplasmose', 'Cultura para estreptococo B'].map((n) => <option key={n} value={n} />)}
             </datalist>
           </Campo>
           <div className="duas-col">
             <Campo rotulo="Data"><input type="date" required value={f.data} onChange={muda('data')} /></Campo>
-            <Campo rotulo="Resultado"><input value={f.resultado} onChange={muda('resultado')} placeholder="Ex.: 5,4%" /></Campo>
+            <Campo rotulo="Resultado principal"><input value={f.resultado} onChange={muda('resultado')} placeholder="Ex.: 5,4%" /></Campo>
           </div>
-          <Campo rotulo="Observação"><input value={f.obs} onChange={muda('obs')} /></Campo>
-          <button className="btn btn-primario btn-largo">Salvar</button>
+          <Campo rotulo="Observação"><input value={f.obs} onChange={muda('obs')} placeholder="Ex.: o médico pediu repetir em 30 dias" /></Campo>
+          <button className="btn btn-primario btn-largo" disabled={salvando}>Salvar</button>
         </form>
+      </Folha>
+      <Folha titulo="Foto do exame" aberta={!!ver} onFechar={() => setVer(null)}>
+        {ver && <FotoGrande id={ver} />}
       </Folha>
     </div>
   )
+}
+
+export function Miniatura({ id, onClick }) {
+  const url = useFotoUrl(id)
+  return <button type="button" className="miniatura" onClick={onClick} style={url ? { backgroundImage: `url(${url})` } : undefined} aria-label="Ver foto" />
+}
+
+function FotoGrande({ id }) {
+  const url = useFotoUrl(id)
+  return url ? <img className="foto-grande" src={url} alt="Foto do exame" /> : <Vazio>Foto não encontrada neste aparelho. Se ela estiver no Google Drive, use Configurações → Restaurar.</Vazio>
 }
 
 function Nutricao() {
